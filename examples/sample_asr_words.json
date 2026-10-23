@@ -1,0 +1,574 @@
+{
+  "words": [
+    {
+      "word": "Hello,",
+      "start": 0.4,
+      "end": 0.74
+    },
+    {
+      "word": "and",
+      "start": 0.74,
+      "end": 1.08
+    },
+    {
+      "word": "welcome",
+      "start": 1.08,
+      "end": 1.42
+    },
+    {
+      "word": "to",
+      "start": 1.42,
+      "end": 1.76
+    },
+    {
+      "word": "the",
+      "start": 1.76,
+      "end": 2.1
+    },
+    {
+      "word": "show.",
+      "start": 2.1,
+      "end": 2.56
+    },
+    {
+      "word": "I'm",
+      "start": 2.56,
+      "end": 2.9
+    },
+    {
+      "word": "Alex.",
+      "start": 2.9,
+      "end": 3.36
+    },
+    {
+      "word": "And",
+      "start": 3.36,
+      "end": 3.7
+    },
+    {
+      "word": "I'm",
+      "start": 3.7,
+      "end": 4.04
+    },
+    {
+      "word": "Sam.",
+      "start": 4.04,
+      "end": 4.5
+    },
+    {
+      "word": "Today",
+      "start": 4.5,
+      "end": 4.84
+    },
+    {
+      "word": "we're",
+      "start": 4.84,
+      "end": 5.18
+    },
+    {
+      "word": "talking",
+      "start": 5.18,
+      "end": 5.52
+    },
+    {
+      "word": "about",
+      "start": 5.52,
+      "end": 5.86
+    },
+    {
+      "word": "why",
+      "start": 5.86,
+      "end": 6.2
+    },
+    {
+      "word": "some",
+      "start": 6.2,
+      "end": 6.54
+    },
+    {
+      "word": "children",
+      "start": 6.54,
+      "end": 6.88
+    },
+    {
+      "word": "refuse",
+      "start": 6.88,
+      "end": 7.22
+    },
+    {
+      "word": "to",
+      "start": 7.22,
+      "end": 7.56
+    },
+    {
+      "word": "eat",
+      "start": 7.56,
+      "end": 7.9
+    },
+    {
+      "word": "vegetables,",
+      "start": 7.9,
+      "end": 8.24
+    },
+    {
+      "word": "and",
+      "start": 8.24,
+      "end": 8.58
+    },
+    {
+      "word": "what",
+      "start": 8.58,
+      "end": 8.92
+    },
+    {
+      "word": "parents",
+      "start": 8.92,
+      "end": 9.26
+    },
+    {
+      "word": "can",
+      "start": 9.26,
+      "end": 9.6
+    },
+    {
+      "word": "do",
+      "start": 9.6,
+      "end": 9.94
+    },
+    {
+      "word": "about",
+      "start": 9.94,
+      "end": 10.28
+    },
+    {
+      "word": "it.",
+      "start": 10.28,
+      "end": 10.74
+    },
+    {
+      "word": "Many",
+      "start": 10.74,
+      "end": 11.08
+    },
+    {
+      "word": "families",
+      "start": 11.08,
+      "end": 11.42
+    },
+    {
+      "word": "turn",
+      "start": 11.42,
+      "end": 11.76
+    },
+    {
+      "word": "dinner",
+      "start": 11.76,
+      "end": 12.1
+    },
+    {
+      "word": "into",
+      "start": 12.1,
+      "end": 12.44
+    },
+    {
+      "word": "a",
+      "start": 12.44,
+      "end": 12.78
+    },
+    {
+      "word": "battle.",
+      "start": 12.78,
+      "end": 13.24
+    },
+    {
+      "word": "But",
+      "start": 13.24,
+      "end": 13.58
+    },
+    {
+      "word": "experts",
+      "start": 13.58,
+      "end": 13.92
+    },
+    {
+      "word": "say",
+      "start": 13.92,
+      "end": 14.26
+    },
+    {
+      "word": "pressure",
+      "start": 14.26,
+      "end": 14.6
+    },
+    {
+      "word": "makes",
+      "start": 14.6,
+      "end": 14.94
+    },
+    {
+      "word": "things",
+      "start": 14.94,
+      "end": 15.28
+    },
+    {
+      "word": "worse.",
+      "start": 15.28,
+      "end": 15.74
+    },
+    {
+      "word": "Instead,",
+      "start": 15.74,
+      "end": 16.08
+    },
+    {
+      "word": "parents",
+      "start": 16.08,
+      "end": 16.42
+    },
+    {
+      "word": "should",
+      "start": 16.42,
+      "end": 16.76
+    },
+    {
+      "word": "offer",
+      "start": 16.76,
+      "end": 17.1
+    },
+    {
+      "word": "the",
+      "start": 17.1,
+      "end": 17.44
+    },
+    {
+      "word": "same",
+      "start": 17.44,
+      "end": 17.78
+    },
+    {
+      "word": "food",
+      "start": 17.78,
+      "end": 18.12
+    },
+    {
+      "word": "again",
+      "start": 18.12,
+      "end": 18.46
+    },
+    {
+      "word": "and",
+      "start": 18.46,
+      "end": 18.8
+    },
+    {
+      "word": "again,",
+      "start": 18.8,
+      "end": 19.14
+    },
+    {
+      "word": "without",
+      "start": 19.14,
+      "end": 19.48
+    },
+    {
+      "word": "forcing",
+      "start": 19.48,
+      "end": 19.82
+    },
+    {
+      "word": "anyone",
+      "start": 19.82,
+      "end": 20.16
+    },
+    {
+      "word": "to",
+      "start": 20.16,
+      "end": 20.5
+    },
+    {
+      "word": "finish",
+      "start": 20.5,
+      "end": 20.84
+    },
+    {
+      "word": "the",
+      "start": 20.84,
+      "end": 21.18
+    },
+    {
+      "word": "plate.",
+      "start": 21.18,
+      "end": 21.64
+    },
+    {
+      "word": "Research",
+      "start": 21.64,
+      "end": 21.98
+    },
+    {
+      "word": "shows",
+      "start": 21.98,
+      "end": 22.32
+    },
+    {
+      "word": "that",
+      "start": 22.32,
+      "end": 22.66
+    },
+    {
+      "word": "children",
+      "start": 22.66,
+      "end": 23.0
+    },
+    {
+      "word": "often",
+      "start": 23.0,
+      "end": 23.34
+    },
+    {
+      "word": "need",
+      "start": 23.34,
+      "end": 23.68
+    },
+    {
+      "word": "to",
+      "start": 23.68,
+      "end": 24.02
+    },
+    {
+      "word": "taste",
+      "start": 24.02,
+      "end": 24.36
+    },
+    {
+      "word": "a",
+      "start": 24.36,
+      "end": 24.7
+    },
+    {
+      "word": "new",
+      "start": 24.7,
+      "end": 25.04
+    },
+    {
+      "word": "food",
+      "start": 25.04,
+      "end": 25.38
+    },
+    {
+      "word": "eight",
+      "start": 25.38,
+      "end": 25.72
+    },
+    {
+      "word": "or",
+      "start": 25.72,
+      "end": 26.06
+    },
+    {
+      "word": "ten",
+      "start": 26.06,
+      "end": 26.4
+    },
+    {
+      "word": "times",
+      "start": 26.4,
+      "end": 26.74
+    },
+    {
+      "word": "before",
+      "start": 26.74,
+      "end": 27.08
+    },
+    {
+      "word": "they",
+      "start": 27.08,
+      "end": 27.42
+    },
+    {
+      "word": "accept",
+      "start": 27.42,
+      "end": 27.76
+    },
+    {
+      "word": "it.",
+      "start": 27.76,
+      "end": 28.22
+    },
+    {
+      "word": "So,",
+      "start": 28.22,
+      "end": 28.56
+    },
+    {
+      "word": "how",
+      "start": 28.56,
+      "end": 28.9
+    },
+    {
+      "word": "can",
+      "start": 28.9,
+      "end": 29.24
+    },
+    {
+      "word": "parents",
+      "start": 29.24,
+      "end": 29.58
+    },
+    {
+      "word": "make",
+      "start": 29.58,
+      "end": 29.92
+    },
+    {
+      "word": "dinnertime",
+      "start": 29.92,
+      "end": 30.26
+    },
+    {
+      "word": "something",
+      "start": 30.26,
+      "end": 30.6
+    },
+    {
+      "word": "everyone",
+      "start": 30.6,
+      "end": 30.94
+    },
+    {
+      "word": "enjoys?",
+      "start": 30.94,
+      "end": 31.4
+    },
+    {
+      "word": "First,",
+      "start": 31.4,
+      "end": 31.74
+    },
+    {
+      "word": "keep",
+      "start": 31.74,
+      "end": 32.08
+    },
+    {
+      "word": "the",
+      "start": 32.08,
+      "end": 32.42
+    },
+    {
+      "word": "mood",
+      "start": 32.42,
+      "end": 32.76
+    },
+    {
+      "word": "light.",
+      "start": 32.76,
+      "end": 33.22
+    },
+    {
+      "word": "Second,",
+      "start": 33.22,
+      "end": 33.56
+    },
+    {
+      "word": "eat",
+      "start": 33.56,
+      "end": 33.9
+    },
+    {
+      "word": "together",
+      "start": 33.9,
+      "end": 34.24
+    },
+    {
+      "word": "whenever",
+      "start": 34.24,
+      "end": 34.58
+    },
+    {
+      "word": "possible.",
+      "start": 34.58,
+      "end": 35.04
+    },
+    {
+      "word": "And",
+      "start": 35.04,
+      "end": 35.38
+    },
+    {
+      "word": "finally,",
+      "start": 35.38,
+      "end": 35.72
+    },
+    {
+      "word": "don't",
+      "start": 35.72,
+      "end": 36.06
+    },
+    {
+      "word": "use",
+      "start": 36.06,
+      "end": 36.4
+    },
+    {
+      "word": "dessert",
+      "start": 36.4,
+      "end": 36.74
+    },
+    {
+      "word": "as",
+      "start": 36.74,
+      "end": 37.08
+    },
+    {
+      "word": "a",
+      "start": 37.08,
+      "end": 37.42
+    },
+    {
+      "word": "reward.",
+      "start": 37.42,
+      "end": 37.88
+    },
+    {
+      "word": "That's",
+      "start": 37.88,
+      "end": 38.22
+    },
+    {
+      "word": "all",
+      "start": 38.22,
+      "end": 38.56
+    },
+    {
+      "word": "for",
+      "start": 38.56,
+      "end": 38.9
+    },
+    {
+      "word": "today.",
+      "start": 38.9,
+      "end": 39.36
+    },
+    {
+      "word": "Thanks",
+      "start": 39.36,
+      "end": 39.7
+    },
+    {
+      "word": "for",
+      "start": 39.7,
+      "end": 40.04
+    },
+    {
+      "word": "listening.",
+      "start": 40.04,
+      "end": 40.5
+    },
+    {
+      "word": "Goodbye.",
+      "start": 40.5,
+      "end": 40.96
+    }
+  ]
+}
