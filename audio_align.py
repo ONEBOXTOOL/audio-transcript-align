@@ -49,7 +49,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import NoReturn
+from typing import Callable, NoReturn
 from urllib.parse import quote
 
 # faster-whisper / av 是可选依赖，装在运行脚本的 venv 里；IDE 解析不到是正常的。
@@ -60,12 +60,21 @@ from urllib.parse import quote
 # 基础
 # --------------------------------------------------------------------------- #
 
+class AlignCancelled(Exception):
+    """用户取消了当前任务（GUI 用）。"""
+
+
+LOG_HOOK: Callable[[str], None] | None = None
+
+
 def log(msg: str) -> None:
+    if LOG_HOOK is not None:
+        LOG_HOOK(msg)
     print(f"[audio-align] {msg}", file=sys.stderr, flush=True)
 
 
 def die(msg: str) -> NoReturn:
-    print(f"[audio-align] ERROR: {msg}", file=sys.stderr, flush=True)
+    log(f"ERROR: {msg}")
     raise SystemExit(1)
 
 
@@ -640,7 +649,11 @@ def transcribe(
     language: str,
     model_dir: Path,
     beam_size: int,
+    progress: Callable[[float, str], None] | None = None,
+    cancel: Callable[[], bool] | None = None,
 ) -> tuple[list[Word], float]:
+    if cancel and cancel():
+        raise AlignCancelled
     try:
         import av
         if int(str(av.__version__).split(".")[0]) >= 19:
@@ -660,6 +673,8 @@ def transcribe(
         die("缺少 faster-whisper。先运行: pip install -r requirements.txt")
 
     log(f"加载模型 {model_name}（{device}/{compute_type}）…")
+    if progress:
+        progress(0.02, "加载模型…")
     kwargs = {}
     if model_dir:
         model_dir.mkdir(parents=True, exist_ok=True)
@@ -671,7 +686,11 @@ def transcribe(
             "提示：国内网络先设置 HF_ENDPOINT=https://hf-mirror.com；"
             "或手动下载模型目录后用 --model <本地目录>")
 
+    if cancel and cancel():
+        raise AlignCancelled
     log("开始转写…")
+    if progress:
+        progress(0.05, "开始转写…")
     segments, info = model.transcribe(
         str(audio),
         language=language,
@@ -681,9 +700,12 @@ def transcribe(
         condition_on_previous_text=False,
     )
 
+    total = float(getattr(info, "duration", 0.0) or 0.0)
     words: list[Word] = []
     n = 0
     for seg in segments:
+        if cancel and cancel():
+            raise AlignCancelled
         n += 1
         if seg.words:
             for w in seg.words:
@@ -692,11 +714,18 @@ def transcribe(
                     words.append(Word(text, float(w.start), float(w.end)))
         if n % 20 == 0:
             log(f"  {n} 段 / {len(words)} 词 / 到 {seg.end:.1f}s")
+        if progress and total > 0:
+            progress(0.05 + 0.85 * min(1.0, float(seg.end) / total),
+                     f"转写中 {seg.end:.1f}s / {total:.1f}s")
     log(f"转写完成：{len(words)} 个词")
+    if progress:
+        progress(0.9, "转写完成")
 
-    duration = float(getattr(info, "duration", 0.0) or 0.0)
+    duration = total
     if duration <= 0:
         duration = probe_duration(audio)
+    if words:
+        duration = max(duration, words[-1].end)
     return words, duration
 
 

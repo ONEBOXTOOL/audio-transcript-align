@@ -7,7 +7,7 @@ name = "audio-transcript-align"
 version = "0.1.0"
 description = "Align an audio file and its transcript into sentence-level timestamps, JSON and a browser QA page."
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.13"
 license = { text = "MIT" }
 authors = [{ name = "ONEBOXTOOL" }]
 keywords = ["audio", "transcript", "alignment", "whisper", "subtitles", "dictation"]
@@ -24,6 +24,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+desktop = ["PySide6-Essentials>=6.6", "PySide6-Addons>=6.6"]
+build = ["pyinstaller>=6.10"]
 
 [project.scripts]
 audio-align = "audio_align:main"

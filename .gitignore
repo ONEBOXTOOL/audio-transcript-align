@@ -21,3 +21,6 @@ data/
 Thumbs.db
 .idea/
 .vscode/
+
+# 桌面版构建产物
+dist/

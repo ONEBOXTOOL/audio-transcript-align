@@ -1,0 +1,16 @@
+AudioAlign · 使用说明
+
+1. 双击 AudioAlign.exe 打开。
+2. 选择音频（mp3 / m4a / wav / flac / ogg）和文稿（txt / md），再选输出目录。
+3. 点“开始对齐”。6 分钟音频在普通 CPU 上约 1–2 分钟。
+4. 完成后可以“进入校对”：逐句播放、±0.1 秒微调、重打点、导出 JSON。
+5. 输出目录里会生成：
+   - episode.json     给 App/服务器读取
+   - preview.html     浏览器校对页（可单独打开）
+   - asr_words.json   词级时间戳，排查用
+
+说明：
+- 音频和文稿都只在本机处理，不上传。
+- small.en 模型已内置，不需要联网、不需要装 Python/ffmpeg。
+- 文稿是英文；PDF 请先转成 txt（推荐 pdftotext -layout）。
+- 改动只在“导出 JSON”时写回；导出会同时重写 preview.html。

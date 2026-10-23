@@ -146,6 +146,23 @@ out/
 
 短句用 `requestAnimationFrame` 检查播放位置，0.27 秒的 `Is it:` 也能停在 `end`，不会拖到下一句。
 
+## 桌面版（Windows）
+
+不想用命令行时，有一套 PySide6 单窗口版：选音频/文稿/输出目录 → 进度 → 完成 → 内置校对台。
+
+```bash
+pip install -r requirements-desktop.txt
+python run_desktop.py
+```
+
+打包成 exe（PyInstaller onedir + 内置 small.en）：
+
+```bash
+python tools\build_desktop.py --zip
+```
+
+产物在 `dist/AudioAlign/`，绿色 zip 在 `dist/AudioAlign-win64.zip`。详细结构与构建说明见 **[docs/desktop.md](docs/desktop.md)**。
+
 ## 实现流程
 
 ```mermaid

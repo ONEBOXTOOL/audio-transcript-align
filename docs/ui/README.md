@@ -1,5 +1,7 @@
 # 校对页 UI · 三个方向
 
+> 说明：桌面版最终采用 **PySide6 / Qt Widgets**，本目录的 HTML 原型作为设计稿保留；实际界面见 [../desktop.md](../desktop.md)。
+
 这页是 `preview.html` 的 UI 方案对比，不是最终实现。三份原型都用**真实 gold 数据**（`data/gold/episode.json`，76 句 / 6:28.82 / 平均对齐 0.993）渲染，桌面 1440×900、手机 390×844。
 
 - 总览：`compare.png`
