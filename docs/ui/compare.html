@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>校对页 UI · 三个方向</title>
+<style>
+  :root{--paper:#EFEBE1;--surface:#FCFAF4;--ink:#1C221E;--muted:#6E6657;--faint:#9A917F;
+    --line:#E0D5C0;--line2:#D3C4A8;--green:#2F5D50;--amber:#C6863C;--mono:ui-monospace,Consolas,monospace}
+  *{box-sizing:border-box}
+  body{margin:0;width:1560px;height:820px;overflow:hidden;background:var(--paper);color:var(--ink);
+    font:12px/1.5 -apple-system,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif;padding:24px 32px}
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:16px}
+  .kicker{font-size:9.5px;letter-spacing:2px;color:var(--amber);font-weight:800}
+  h1{font-family:Georgia,"Noto Serif SC",serif;font-size:27px;line-height:1.2;margin:5px 0 0;font-weight:600;letter-spacing:-.2px}
+  header .meta{text-align:right;font-size:10px;color:var(--faint);line-height:1.7}
+  header .meta b{color:var(--muted);font-weight:600}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:15px 16px 13px;display:flex;flex-direction:column;min-width:0;
+    box-shadow:0 8px 22px rgba(64,48,22,.05)}
+  .chead{display:flex;align-items:baseline;gap:9px;padding-right:52px}
+  .num{font-family:var(--mono);font-size:11px;color:var(--faint)}
+  .title{font-family:Georgia,"Noto Serif SC",serif;font-size:21px;font-weight:600;letter-spacing:-.2px}
+  .sub{font-size:9.5px;color:var(--faint);letter-spacing:.5px;margin-top:2px}
+  .rec{position:absolute;top:14px;right:14px;background:var(--green);color:#fff;font-size:9.5px;
+    padding:3px 8px;border-radius:99px;font-weight:600;letter-spacing:.3px}
+  .shot{margin-top:11px;border:1px solid var(--line2);border-radius:9px;overflow:hidden;background:#fff;position:relative}
+  .chrome{height:19px;display:flex;align-items:center;gap:4px;padding:0 7px;background:#F2EDDF;border-bottom:1px solid #E6DBC7}
+  .chrome i{width:5px;height:5px;border-radius:50%;background:#CFC2A9;display:inline-block}
+  .chrome span{font-family:var(--mono);font-size:8px;color:var(--faint);margin-left:4px}
+  .shot img{display:block;width:100%;height:auto}
+  .phone{position:absolute;right:14px;bottom:12px;width:86px;border:5px solid #232823;border-radius:14px;
+    overflow:hidden;box-shadow:0 10px 22px rgba(0,0,0,.20);background:#232823}
+  .phone:before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:26px;height:4px;
+    background:#232823;border-radius:0 0 4px 4px;z-index:2}
+  .phone img{display:block;width:100%}
+  .desc{margin-top:11px;font-size:10.8px;line-height:1.62;color:#333B33;min-height:52px}
+  .desc b{color:var(--ink)}
+  .rows{margin-top:7px;display:grid;gap:4px;font-size:9.8px;color:var(--muted);line-height:1.5}
+  .rows span{display:grid;grid-template-columns:34px 1fr;gap:4px}
+  .rows em{font-style:normal;color:var(--faint)}
+  .foot{margin-top:auto;padding-top:9px;border-top:1px solid #E8DECB;display:flex;align-items:center;
+    justify-content:space-between;font-size:9.2px;color:var(--faint)}
+  .foot .cost{font-family:var(--mono);color:var(--muted)}
+  .bars{display:flex;gap:3px;align-items:flex-end;height:12px}
+  .bars i{width:5px;border-radius:1px;background:#DCD1BC;display:block}
+  .bars i.on{background:var(--green)}
+  .bottombar{margin-top:14px;display:flex;align-items:center;justify-content:space-between;gap:18px;
+    border-top:1px solid var(--line2);padding-top:10px;font-size:9.6px;color:var(--faint)}
+  .bottombar b{color:var(--muted);font-weight:600}
+  .bottombar .tag{display:inline-flex;align-items:center;gap:6px;margin-right:14px}
+  .bottombar .tag i{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <div class="kicker">PREVIEW / REVIEW UI · 3 DIRECTIONS</div>
+    <h1>校对页的三个方向</h1>
+  </div>
+  <div class="meta">真实素材：<b>Why do people buy gold?</b> · 76 句 · 6:28.82 · 平均对齐 99.3%<br>
+    桌面 1440×900 · 手机 390×844 · 同一套配色与数据契约</div>
+</header>
+
+<div class="grid">
+  <section class="card">
+    <div class="chead"><span class="num">01</span><div><div class="title">波形精修台</div><div class="sub">WAVEFORM WORKBENCH</div></div></div>
+    <div class="rec">推荐</div>
+    <div class="shot">
+      <div class="chrome"><i></i><i></i><i></i><span>preview.html · 1440</span></div>
+      <img src="shot-a-1440.png" alt="方案 A 桌面">
+      <div class="phone"><img src="shot-a-390.png" alt="方案 A 手机"></div>
+    </div>
+    <div class="desc"><b>看全局，也改得动。</b>波形上直接看到句子块与静音缝隙，拖边缘改边界；下方编辑器给到词级时间戳与置信度。</div>
+    <div class="rows">
+      <span><em>适合</em>逐期精修、抓切首词/切尾词</span>
+      <span><em>代价</em>前端最重；时间轴缩放/拖拽要打磨</span>
+      <span><em>依赖</em>预计算 peaks；建议加词级 sidecar</span>
+    </div>
+    <div class="foot"><span>编辑强度 ●●●●○</span><span class="cost">3–4 天</span></div>
+  </section>
+
+  <section class="card">
+    <div class="chead"><span class="num">02</span><div><div class="title">审阅队列</div><div class="sub">REVIEW QUEUE</div></div></div>
+    <div class="shot">
+      <div class="chrome"><i></i><i></i><i></i><span>preview.html · 1440</span></div>
+      <img src="shot-b-1440.png" alt="方案 B 桌面">
+      <div class="phone"><img src="shot-b-390.png" alt="方案 B 手机"></div>
+    </div>
+    <div class="desc"><b>一次只判断一句。</b>大字号 + 单句波形 + 「准确/跳过」；左侧队列记录进度，适合每天批量过稿。</div>
+    <div class="rows">
+      <span><em>适合</em>低置信度多、需要稳定节奏</span>
+      <span><em>代价</em>缺全局视角，精修仍要回表格</span>
+      <span><em>依赖</em>仅现有数据；评审状态本地持久化</span>
+    </div>
+    <div class="foot"><span>编辑强度 ●●○○○</span><span class="cost">1.5–2 天</span></div>
+  </section>
+
+  <section class="card">
+    <div class="chead"><span class="num">03</span><div><div class="title">沉浸精读稿</div><div class="sub">READER / TELEPROMPTER</div></div></div>
+    <div class="shot">
+      <div class="chrome"><i></i><i></i><i></i><span>preview.html · 1440</span></div>
+      <img src="shot-c-1440.png" alt="方案 C 桌面">
+      <div class="phone"><img src="shot-c-390.png" alt="方案 C 手机"></div>
+    </div>
+    <div class="desc"><b>先读，再改。</b>把句子还原成对话段落，当前句跟随播放高亮；编辑收进底部工具条，适合内容校对与跟读。</div>
+    <div class="rows">
+      <span><em>适合</em>通读检查、直接当听力页交付</span>
+      <span><em>代价</em>时间边界编辑弱，长稿定位靠跳句</span>
+      <span><em>依赖</em>无新增数据；可开放 hash 定位</span>
+    </div>
+    <div class="foot"><span>编辑强度 ●○○○○</span><span class="cost">约 1 天</span></div>
+  </section>
+</div>
+
+<div class="bottombar">
+  <div><span class="tag"><i></i>三种方案共用</span><b>episode.json</b> 的 76 句真实数据；都保持单文件 `preview.html`、本地 `file://` 打开、无后端。</div>
+  <div>生产化前置：<b>edited 落盘 · needs_review 重算 · duration 收口</b>（上一轮 review 的三处契约问题）</div>
+</div>
+</body>
+</html>

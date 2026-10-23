@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>方案 B · 审阅队列</title>
+<style>
+  :root{
+    --bg:#F1EEE6; --surface:#FCFAF4; --surface2:#F7F3E9; --ink:#1B211D;
+    --muted:#6C6455; --faint:#9B9280; --line:#E1D6C1; --line2:#D2C5AA;
+    --green:#2F5D50; --green2:#3F7A68; --mint:#DCE8E2; --mint2:#EDF4F0;
+    --amber:#C6863C; --red:#B3352B; --mono:ui-monospace,SFMono-Regular,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);display:flex;flex-direction:column;overflow:hidden;
+    font:13px/1.45 -apple-system,"Segoe UI","Noto Sans SC","Microsoft YaHei",sans-serif}
+  button{font-family:inherit;color:inherit;cursor:pointer}
+  button:focus-visible{outline:2px solid var(--green2);outline-offset:2px}
+
+  .top{height:56px;flex:0 0 56px;display:flex;align-items:center;gap:16px;padding:0 22px;
+    background:var(--surface);border-bottom:1px solid var(--line)}
+  .brand{display:flex;align-items:center;gap:9px;font-size:11px;font-weight:800;letter-spacing:1.7px;
+    color:var(--green);white-space:nowrap}
+  .brand .mark{width:19px;height:19px;border-radius:6px;background:var(--green);color:#fff;
+    display:grid;place-items:center;font-size:9px;letter-spacing:0}
+  .brand .sub{color:var(--ink);font-weight:600;letter-spacing:.6px}
+  .brand .slash{color:var(--faint);font-weight:400;letter-spacing:0;margin:0 2px}
+  .ep{flex:1;min-width:0;font-family:Georgia,"Noto Serif SC",serif;font-size:16px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ep span{font-family:-apple-system,"Segoe UI",sans-serif;font-size:10.5px;color:var(--faint);margin-left:9px}
+  .top .stats{display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .pill{font-size:10.5px;padding:3px 9px;border-radius:99px;border:1px solid var(--line);
+    background:var(--surface2);color:var(--muted);font-variant-numeric:tabular-nums}
+  .pill.ok{background:var(--mint);border-color:#C8DED3;color:#1E4A3D}
+  .top .btn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;
+    padding:6px 11px;font-size:11.5px}
+  .top .btn.primary{background:var(--green);border-color:var(--green);color:#fff;font-weight:600}
+
+  .app{flex:1;display:grid;grid-template-columns:296px minmax(0,1fr);min-height:0}
+
+  /* ---- queue ---- */
+  .queue{background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+  .qhead{padding:16px 16px 12px;border-bottom:1px solid var(--line)}
+  .kicker{font-size:9.5px;letter-spacing:1.5px;color:var(--amber);font-weight:800;text-transform:uppercase}
+  .qcount{margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .qcount b{font-size:18px;color:var(--ink);font-weight:600;letter-spacing:-.5px}
+  .bar{height:4px;border-radius:99px;background:#E8E0D0;margin-top:9px;overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--green);border-radius:99px}
+  .filters{display:flex;gap:5px;padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .chip{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:3px 9px;
+    font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .chip b{font-weight:600;color:var(--ink);margin-left:2px}
+  .chip.on{background:var(--green);border-color:var(--green);color:#fff}
+  .chip.on b{color:#fff}
+  .qlist{flex:1;overflow-y:auto;min-height:0;padding:6px 7px 16px}
+  .qlist::-webkit-scrollbar{width:10px}
+  .qlist::-webkit-scrollbar-thumb{background:#D7CCB7;border-radius:6px;border:3px solid var(--surface)}
+  .qrow{display:grid;grid-template-columns:20px minmax(0,1fr) auto;gap:8px;align-items:start;
+    padding:8px 8px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+  .qrow:hover{background:var(--surface2)}
+  .qrow.current{background:var(--mint2);border-color:#C4DACE}
+  .qrow .st{width:16px;height:16px;border-radius:50%;border:1.5px solid #CFC3AC;margin-top:2px;
+    display:grid;place-items:center;font-size:9px;color:#fff;flex:0 0 16px}
+  .qrow.done .st{background:var(--green);border-color:var(--green)}
+  .qrow.current .st{border-color:var(--green);background:#fff;color:var(--green);font-size:8px}
+  .qrow .qt{min-width:0}
+  .qrow .qt p{margin:0;font-family:Georgia,"Times New Roman",serif;font-size:12px;line-height:1.4;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#333A34}
+  .qrow.current .qt p{color:var(--ink)}
+  .qrow .qt .who{font-family:-apple-system,"Segoe UI",sans-serif;font-size:9px;color:var(--faint);margin-top:2px}
+  .qrow .qt .who em{font-style:normal;color:var(--amber)}
+  .qrow .tt{font-family:var(--mono);font-size:9px;color:var(--faint);text-align:right;padding-top:2px;white-space:nowrap}
+  .qfoot{padding:9px 14px;border-top:1px solid var(--line);font-size:9.5px;color:var(--faint);line-height:1.5}
+
+  /* ---- focus ---- */
+  main{min-width:0;display:flex;flex-direction:column;min-height:0;overflow-y:auto}
+  .focusbar{height:50px;flex:0 0 50px;display:flex;align-items:center;gap:14px;padding:0 26px;
+    border-bottom:1px solid var(--line);background:rgba(252,250,244,.6);position:sticky;top:0;z-index:3;
+    backdrop-filter:blur(6px)}
+  .counter{font-family:var(--mono);font-size:11px;color:var(--faint);white-space:nowrap}
+  .counter b{font-size:17px;color:var(--ink)}
+  .crumbs{flex:1;min-width:0;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .crumbs i{font-style:normal;color:var(--faint);margin:0 6px}
+  .focusbar .r{display:flex;align-items:center;gap:8px}
+
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:18px 26px 26px;min-height:0}
+  .posbar{width:100%;max-width:880px;display:flex;gap:1px;height:10px;margin-bottom:14px}
+  .posbar span{flex:1;border-radius:2px;background:#D9D0BE;min-width:0}
+  .posbar span.done{background:#9BBBAE}
+  .posbar span.cur{background:var(--green);box-shadow:0 0 0 2px rgba(47,93,80,.18)}
+  .posbar span.flag{background:var(--amber)}
+
+  .card{width:100%;max-width:880px;background:var(--surface);border:1px solid var(--line);
+    border-radius:16px;padding:22px 26px 20px;box-shadow:0 12px 34px rgba(64,48,22,.07),0 1px 0 rgba(255,255,255,.7) inset}
+  .cardtop{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .who{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);
+    border:1px solid var(--line);background:var(--surface2);border-radius:99px;padding:3px 9px}
+  .who i{width:7px;height:7px;border-radius:50%}
+  .cardtop .num{font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.4px}
+  .cardtop .cf{font-size:9.5px;font-family:var(--mono);color:#1E4A3D;background:var(--mint);
+    border-radius:99px;padding:2px 8px}
+  .cardtop .ed{font-size:9.5px;color:#7A5322;background:#F7EBD8;border:1px solid #EAD6B4;border-radius:99px;
+    padding:2px 8px;display:none}
+  .cardtop .ed.on{display:inline-block}
+  .cardtop .spacer{flex:1}
+  .cardtop .pos{font-family:var(--mono);font-size:10px;color:var(--faint)}
+
+  .sentence{margin-top:16px;font-family:Georgia,"Times New Roman",serif;font-size:31px;line-height:1.38;
+    letter-spacing:.1px;color:var(--ink);outline:none;min-height:86px}
+  .sentence:focus{background:#FFFDF7;box-shadow:0 0 0 6px #FFFDF7}
+  .sentence:empty:before{content:"（空句）";color:var(--faint)}
+
+  .clip{margin-top:16px}
+  #clipwave{display:block;width:100%;height:56px;border-radius:8px;background:#F8F5EC;cursor:pointer}
+  .clipmeta{display:flex;justify-content:space-between;margin-top:3px;font-family:var(--mono);
+    font-size:9px;color:var(--faint)}
+
+  .playrow{display:flex;align-items:center;gap:9px;margin-top:10px;flex-wrap:wrap}
+  .bigplay{width:46px;height:46px;border-radius:50%;border:0;background:var(--green);color:#fff;
+    font-size:15px;display:grid;place-items:center;flex:0 0 46px;box-shadow:0 5px 14px rgba(47,93,80,.25)}
+  .bigplay:hover{background:#254b40}
+  .ghost{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:7px 11px;
+    font-size:11px;color:var(--muted);white-space:nowrap}
+  .ghost:hover{border-color:var(--green);color:var(--green)}
+  .ghost.on{background:var(--mint);border-color:#BFD8CD;color:#1E4A3D}
+  select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:7px 6px;
+    font-size:11px;color:var(--ink);font-family:inherit}
+  .playrow .range{margin-left:4px;font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap}
+  .playrow .spacer{flex:1}
+
+  .adjust{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:12px;padding:10px 12px;
+    background:var(--surface2);border:1px solid var(--line);border-radius:10px}
+  .adj{display:flex;align-items:center;gap:6px}
+  .adj .lab{font-size:9.5px;letter-spacing:.6px;color:var(--faint);font-weight:700}
+  .adj input{width:66px;border:1px solid var(--line);border-radius:6px;background:#fff;padding:5px 7px;
+    font-family:var(--mono);font-size:12.5px;color:var(--ink);font-variant-numeric:tabular-nums}
+  .adj input:focus{outline:none;border-color:var(--green2)}
+  .adj button{width:30px;height:24px;border:1px solid var(--line);background:var(--surface);border-radius:6px;
+    font-family:var(--mono);font-size:9.5px;color:var(--muted)}
+  .adjust .sep{width:1px;height:20px;background:var(--line);margin:0 3px}
+  .adjust .hint{margin-left:auto;font-size:9.5px;color:var(--faint);white-space:nowrap}
+
+  .decide{display:flex;align-items:center;gap:8px;margin-top:14px}
+  .decide .ok{flex:1;border:0;background:var(--green);color:#fff;border-radius:10px;padding:12px 16px;
+    font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:9px}
+  .decide .ok:hover{background:#254b40}
+  .decide .skip{border:1px solid var(--line2);background:var(--surface);border-radius:10px;padding:11px 16px;
+    font-size:12px;color:var(--muted)}
+  kbd{font-family:var(--mono);font-size:9px;border:1px solid rgba(255,255,255,.35);border-radius:4px;
+    padding:1px 4px;color:inherit;opacity:.8}
+  .decide .skip kbd{border-color:var(--line2);color:var(--faint)}
+
+  .context{width:100%;max-width:880px;display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+  .ctx{background:rgba(252,250,244,.55);border:1px solid var(--line);border-radius:10px;padding:9px 11px;cursor:pointer}
+  .ctx:hover{background:var(--surface)}
+  .ctx span{font-size:9px;letter-spacing:.8px;color:var(--faint);font-weight:700}
+  .ctx p{margin:4px 0 0;font-family:Georgia,"Times New Roman",serif;font-size:12px;line-height:1.45;
+    color:#57604F;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .keys{width:100%;max-width:880px;display:flex;justify-content:center;gap:16px;flex-wrap:wrap;
+    margin-top:12px;font-size:9.5px;color:var(--faint)}
+  .keys b{font-family:var(--mono);color:var(--muted);font-weight:500}
+
+  @media (max-width:960px){
+    .app{grid-template-columns:1fr}
+    .queue{display:none}
+    .ep span,.top .stats .pill{display:none}
+    .top{padding:0 14px;gap:10px}
+    .focusbar{padding:0 14px;gap:8px}
+    .focusbar .r,.crumbs{display:none}
+    .sentence{font-size:24px}
+    .card{padding:18px}
+    .stage{padding:14px}
+    .context{grid-template-columns:1fr}
+    .context .prev{display:none}
+    .keys{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand"><span class="mark">AA</span>AUDIO ALIGN<span class="slash">/</span><span class="sub">审阅队列</span></div>
+  <div class="ep" id="epTitle"></div>
+  <div class="stats">
+    <span class="pill" id="pillLow">待校对 0</span>
+    <span class="pill ok" id="pillDone">已过 12 / 76</span>
+    <button class="btn" id="exportBtn">导出 episode.json</button>
+  </div>
+</header>
+
+<div class="app">
+  <aside class="queue">
+    <div class="qhead">
+      <div class="kicker">Review queue</div>
+      <div class="qcount"><b id="doneN">12</b> / <span id="totalN">76</span> 已过 <span style="color:var(--faint)">· 剩余 <span id="leftN">64</span></span></div>
+      <div class="bar"><i id="doneBar" style="width:16%"></i></div>
+    </div>
+    <div class="filters" id="filters">
+      <button class="chip on" data-f="all">全部 <b id="cAll">76</b></button>
+      <button class="chip" data-f="todo">未过 <b id="cTodo">64</b></button>
+      <button class="chip" data-f="edited">已改 <b id="cEdit">0</b></button>
+    </div>
+    <div class="qlist" id="qlist"></div>
+    <div class="qfoot">通过的句子打勾并自动跳下一句；跳过不计数。<br>整期 76 句，约 6 分半。</div>
+  </aside>
+
+  <main>
+    <div class="focusbar">
+      <div class="counter"><b id="fIdx">13</b> / <span id="fTotal">76</span></div>
+      <div class="crumbs" id="crumbs"></div>
+      <div class="r">
+        <span class="pill" id="fConf">置信度 100%</span>
+        <span class="pill" id="fTime">55.12 – 60.14</span>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="posbar" id="posbar"></div>
+
+      <div class="card">
+        <div class="cardtop">
+          <span class="who" id="fWho"><i></i><span></span></span>
+          <span class="num" id="fNum">第 13 句</span>
+          <span class="cf" id="fMatch">100% 匹配</span>
+          <span class="ed" id="fEdited">已手动修改</span>
+          <span class="spacer"></span>
+          <span class="pos" id="fPos"></span>
+        </div>
+
+        <div class="sentence" id="fText" contenteditable="true" spellcheck="false"></div>
+
+        <div class="clip">
+          <canvas id="clipwave"></canvas>
+          <div class="clipmeta"><span id="clipA">55.12</span><span id="clipLen">5.02s</span><span id="clipB">60.14</span></div>
+        </div>
+
+        <div class="playrow">
+          <button class="bigplay" id="playBtn" title="Space">▶</button>
+          <button class="ghost" id="loopBtn">↻ 循环</button>
+          <select id="speed">
+            <option value="0.75">0.75×</option><option value="1" selected>1.0×</option>
+            <option value="1.25">1.25×</option><option value="1.5">1.5×</option>
+          </select>
+          <span class="range" id="range"></span>
+          <span class="spacer"></span>
+          <button class="ghost" id="replay">重播 <kbd>R</kbd></button>
+        </div>
+
+        <div class="adjust">
+          <div class="adj"><span class="lab">起点</span><input id="startIn" inputmode="decimal"><button data-n="start-0.1">−.1</button><button data-n="start+0.1">+.1</button></div>
+          <div class="sep"></div>
+          <div class="adj"><span class="lab">终点</span><input id="endIn" inputmode="decimal"><button data-n="end-0.1">−.1</button><button data-n="end+0.1">+.1</button></div>
+          <div class="sep"></div>
+          <button class="ghost" id="retap">重打点</button>
+          <span class="hint">边界改完直接通过即可</span>
+        </div>
+
+        <div class="decide">
+          <button class="ok" id="accept">✓ 准确，下一句 <kbd>Enter</kbd></button>
+          <button class="skip" id="skip">跳过 <kbd>S</kbd></button>
+        </div>
+      </div>
+
+      <div class="context">
+        <div class="ctx prev" id="prevCtx"><span>上一句</span><p></p></div>
+        <div class="ctx next" id="nextCtx"><span>下一句</span><p></p></div>
+      </div>
+
+      <div class="keys">
+        <span><b>Space</b> 播放/暂停</span><span><b>Enter</b> 通过</span><span><b>S</b> 跳过</span>
+        <span><b>J / K</b> 下一句 / 上一句</span><span><b>R</b> 重播</span><span><b>[ ]</b> 起点 ±0.1</span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<audio id="audio" src="../../data/gold/ep.mp3" preload="metadata"></audio>
+
+<script src="data.js"></script>
+<script>
+const EP = window.EP;
+const S = EP.sentences;
+const COLORS = {"Georgie":"#2F5D50","Phil":"#3E6E8E","Catherine Schenk":"#A2653C",
+  "John Reade":"#6A5A8E","Suki Cooper":"#8A7A3B"};
+const colorOf = sp => COLORS[sp] || "#6B6355";
+const $ = s => document.querySelector(s);
+const audio = $('#audio');
+const cv = $('#clipwave');
+
+let idx = 12;
+let done = new Set(Array.from({length:12}, (_, i) => i));
+let filter = 'all';
+let loop = false;
+let stopAt = null;
+let raf = null;
+
+const fmt = t => {
+  if (!isFinite(t) || t < 0) t = 0;
+  const m = Math.floor(t / 60), s = t - m * 60;
+  return m + ':' + s.toFixed(2).padStart(5, '0');
+};
+const pct = s => Math.round((s.confidence || 0) * 100);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g,
+  c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderQueue(){
+  const vis = S.filter(s => filter === 'edited' ? s.edited : filter === 'todo' ? !done.has(s.i) : true);
+  $('#qlist').innerHTML = vis.map(s => {
+    const cls = ['qrow'];
+    if (done.has(s.i)) cls.push('done');
+    if (s.i === idx) cls.push('current');
+    return `<div class="${cls.join(' ')}" data-i="${s.i}">
+      <div class="st">${done.has(s.i) ? '✓' : s.i === idx ? '●' : ''}</div>
+      <div class="qt"><p>${esc(s.text)}</p>
+        <div class="who">${esc(s.speaker || '—')}${s.edited ? ' · <em>已改</em>' : ''}</div></div>
+      <div class="tt">${fmt(s.start).slice(0, 6)}</div>
+    </div>`;
+  }).join('');
+  const cur = $('#qlist .qrow.current');
+  if (cur) cur.scrollIntoView({block:'center'});
+}
+
+function renderPos(){
+  $('#posbar').innerHTML = S.map(s => {
+    const cls = s.i === idx ? 'cur' : done.has(s.i) ? 'done' : '';
+    return `<span class="${cls}" title="第 ${s.i + 1} 句 · ${esc(s.speaker || '')}"></span>`;
+  }).join('');
+}
+
+function renderHeader(){
+  const n = S.length;
+  $('#epTitle').innerHTML = esc(EP.title) + '<span>' + n + ' 句 · ' + fmt(EP.duration) + '</span>';
+  $('#pillLow').textContent = '待校对 ' + S.filter(s => s.needs_review).length;
+  $('#pillDone').textContent = '已过 ' + done.size + ' / ' + n;
+  $('#doneN').textContent = done.size;
+  $('#totalN').textContent = n;
+  $('#leftN').textContent = n - done.size;
+  $('#doneBar').style.width = (done.size / n * 100).toFixed(1) + '%';
+  $('#cAll').textContent = n;
+  $('#cTodo').textContent = n - done.size;
+  $('#cEdit').textContent = S.filter(s => s.edited).length;
+  $('#fTotal').textContent = n;
+}
+
+function renderCard(){
+  const s = S[idx];
+  if (!s) return;
+  $('#fIdx').textContent = idx + 1;
+  $('#fNum').textContent = '第 ' + (idx + 1) + ' 句';
+  $('#fWho').querySelector('i').style.background = colorOf(s.speaker);
+  $('#fWho').querySelector('span').textContent = s.speaker || '—';
+  $('#fMatch').textContent = pct(s) + '% 匹配';
+  $('#fMatch').style.background = s.confidence >= 0.8 ? 'var(--mint)' : '#F7EBD8';
+  $('#fConf').textContent = '置信度 ' + pct(s) + '%';
+  $('#fTime').textContent = s.start.toFixed(2) + ' – ' + s.end.toFixed(2);
+  $('#fPos').textContent = fmt(s.start) + ' / ' + fmt(EP.duration);
+  $('#fEdited').classList.toggle('on', !!s.edited);
+  $('#fText').textContent = s.text;
+  $('#startIn').value = s.start.toFixed(2);
+  $('#endIn').value = s.end.toFixed(2);
+  $('#clipA').textContent = s.start.toFixed(2);
+  $('#clipB').textContent = s.end.toFixed(2);
+  $('#clipLen').textContent = (s.end - s.start).toFixed(2) + 's';
+  $('#range').textContent = s.start.toFixed(2) + ' → ' + s.end.toFixed(2) + ' · ' + (s.end - s.start).toFixed(2) + 's';
+  $('#crumbs').innerHTML = esc(EP.title) + '<i>·</i>第 ' + (idx + 1) + ' 句 / ' + S.length + '<i>·</i>' +
+    esc([...new Set(S.map(x => x.speaker))].filter(Boolean).join(' / '));
+  const prev = S[idx - 1], next = S[idx + 1];
+  $('#prevCtx').querySelector('p').textContent = prev ? prev.text : '（已经是第一句）';
+  $('#nextCtx').querySelector('p').textContent = next ? next.text : '（已经是最后一句）';
+  drawClip();
+}
+
+function drawClip(){
+  const s = S[idx];
+  const dpr = window.devicePixelRatio || 1;
+  const w = cv.clientWidth, h = cv.clientHeight;
+  cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+  g.clearRect(0, 0, w, h);
+  g.fillStyle = '#F8F5EC'; g.fillRect(0, 0, w, h);
+
+  const peaks = EP.peaksHi || EP.peaks;
+  const n = peaks.length;
+  const a = Math.max(0, Math.floor(s.start / EP.duration * n));
+  const b = Math.min(n, Math.ceil(s.end / EP.duration * n));
+  const span = Math.max(1, b - a);
+  const mid = h / 2 + 2;
+  const amp = h * 0.34;
+  g.strokeStyle = 'rgba(47,93,80,.62)';
+  g.lineWidth = Math.max(1, (w / span) * 0.7);
+  g.beginPath();
+  for (let i = a; i < b; i++) {
+    const x = (i - a) / span * w;
+    const v = Math.max(0.02, peaks[i]) * amp;
+    g.moveTo(x, mid - v); g.lineTo(x, mid + v);
+  }
+  g.stroke();
+  g.strokeStyle = '#E7DDCB'; g.beginPath(); g.moveTo(0, mid); g.lineTo(w, mid); g.stroke();
+
+  // clip progress
+  if (audio.currentTime >= s.start && audio.currentTime <= s.end) {
+    const px = (audio.currentTime - s.start) / (s.end - s.start) * w;
+    g.strokeStyle = '#C6863C'; g.lineWidth = 1.2;
+    g.beginPath(); g.moveTo(px, 3); g.lineTo(px, h - 3); g.stroke();
+  }
+  // sentence word ticks (from ASR)
+  const words = EP.words.filter(w => w.start >= s.start - 0.1 && w.end <= s.end + 0.1);
+  g.strokeStyle = 'rgba(28,34,30,.16)'; g.lineWidth = 1;
+  words.forEach(w => {
+    const x = (w.start - s.start) / (s.end - s.start) * w;
+    g.beginPath(); g.moveTo(x, h - 10); g.lineTo(x, h - 4); g.stroke();
+  });
+}
+
+function playClip(){
+  const s = S[idx];
+  stopAt = s.end;
+  const go = () => {
+    audio.currentTime = Math.max(0, s.start);
+    audio.play().catch(() => {});
+    tick();
+  };
+  if (audio.readyState >= 1) go(); else audio.addEventListener('loadedmetadata', go, {once:true});
+}
+function tick(){
+  cancelAnimationFrame(raf);
+  const step = () => {
+    if (audio.paused || stopAt == null) return;
+    if (audio.currentTime >= stopAt - 0.01) {
+      if (loop) { audio.currentTime = S[idx].start; audio.play(); raf = requestAnimationFrame(step); return; }
+      audio.pause(); stopAt = null; drawClip(); return;
+    }
+    drawClip();
+    raf = requestAnimationFrame(step);
+  };
+  raf = requestAnimationFrame(step);
+}
+
+function select(i, play){
+  if (i < 0 || i >= S.length) return;
+  idx = i;
+  renderQueue(); renderPos(); renderCard();
+  if (play) playClip();
+}
+function accept(){
+  done.add(idx);
+  renderHeader(); renderQueue(); renderPos();
+  const nxt = S.findIndex((s, i) => i > idx && !done.has(i));
+  if (nxt >= 0) select(nxt, true);
+  else { $('#accept').textContent = '全部过完 ✓'; $('#accept').disabled = true; }
+}
+function skip(){
+  const nxt = S.findIndex((s, i) => i > idx && !done.has(i));
+  select(nxt >= 0 ? nxt : Math.min(S.length - 1, idx + 1), true);
+}
+
+function nudge(field, d){
+  const s = S[idx];
+  s[field] = Math.max(0, +(s[field] + d).toFixed(3));
+  if (s.end <= s.start + 0.05) s.end = +(s.start + 0.15).toFixed(3);
+  s.edited = true;
+  renderHeader(); renderQueue(); renderCard();
+}
+function commit(field, el){
+  const v = parseFloat(el.value);
+  if (!isFinite(v)) { renderCard(); return; }
+  const s = S[idx];
+  s[field] = Math.max(0, +v.toFixed(3));
+  if (s.end <= s.start + 0.05) s.end = +(s.start + 0.15).toFixed(3);
+  s.edited = true;
+  renderHeader(); renderQueue(); renderCard();
+}
+
+/* events */
+$('#qlist').addEventListener('click', e => {
+  const row = e.target.closest('.qrow');
+  if (row) select(Number(row.dataset.i), false);
+});
+$('#filters').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  filter = c.dataset.f;
+  [...$('#filters').children].forEach(x => x.classList.toggle('on', x === c));
+  renderQueue();
+});
+$('#playBtn').addEventListener('click', () => audio.paused ? playClip() : audio.pause());
+$('#replay').addEventListener('click', playClip);
+$('#loopBtn').addEventListener('click', () => {
+  loop = !loop;
+  $('#loopBtn').classList.toggle('on', loop);
+  $('#loopBtn').textContent = loop ? '↻ 循环中' : '↻ 循环';
+});
+$('#speed').addEventListener('change', e => { audio.playbackRate = parseFloat(e.target.value); });
+$('#accept').addEventListener('click', accept);
+$('#skip').addEventListener('click', skip);
+$('#prevCtx').addEventListener('click', () => select(Math.max(0, idx - 1), false));
+$('#nextCtx').addEventListener('click', () => select(Math.min(S.length - 1, idx + 1), false));
+document.querySelectorAll('[data-n]').forEach(b => b.addEventListener('click', () => {
+  const [f, d] = b.dataset.n.split(/(?=[+-])/);
+  nudge(f, parseFloat(d));
+}));
+$('#startIn').addEventListener('change', e => commit('start', e.target));
+$('#endIn').addEventListener('change', e => commit('end', e.target));
+$('#retap').addEventListener('click', () => {
+  const s = S[idx], next = S[idx + 1], now = audio.currentTime || s.start;
+  s.start = +now.toFixed(3);
+  s.end = next && next.start > now + 0.2 ? +(next.start - 0.05).toFixed(3)
+                                        : +Math.min(audio.duration || now + 3, now + 3).toFixed(3);
+  s.edited = true;
+  renderHeader(); renderQueue(); renderCard();
+});
+$('#fText').addEventListener('input', () => {
+  const s = S[idx];
+  s.text = $('#fText').innerText.trim();
+  s.edited = true;
+  $('#fEdited').classList.add('on');
+  renderHeader(); renderQueue();
+});
+$('#fText').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#fText').blur(); } });
+cv.addEventListener('click', e => {
+  const r = cv.getBoundingClientRect();
+  const t = S[idx].start + (e.clientX - r.left) / r.width * (S[idx].end - S[idx].start);
+  audio.currentTime = Math.max(0, Math.min(EP.duration, t));
+  drawClip();
+});
+audio.addEventListener('play', () => { $('#playBtn').textContent = '❚❚'; tick(); });
+audio.addEventListener('pause', () => { $('#playBtn').textContent = '▶'; drawClip(); });
+audio.addEventListener('timeupdate', drawClip);
+audio.addEventListener('loadedmetadata', () => drawClip());
+document.addEventListener('keydown', e => {
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'select' || tag === 'textarea' || e.target.isContentEditable) return;
+  if (e.code === 'Space') { e.preventDefault(); audio.paused ? playClip() : audio.pause(); }
+  else if (e.key === 'Enter') { e.preventDefault(); accept(); }
+  else if (e.key.toLowerCase() === 's') skip();
+  else if (e.key.toLowerCase() === 'j') select(Math.min(S.length - 1, idx + 1), false);
+  else if (e.key.toLowerCase() === 'k') select(Math.max(0, idx - 1), false);
+  else if (e.key.toLowerCase() === 'r') playClip();
+  else if (e.key === '[') nudge('start', -0.1);
+  else if (e.key === ']') nudge('start', 0.1);
+});
+$('#exportBtn').addEventListener('click', () => {
+  const data = {version:1, title:EP.title, audio:'../../data/gold/ep.mp3', duration:EP.duration,
+    language:EP.language, model:EP.model, generated_at:new Date().toISOString(),
+    stats:{sentences:S.length, low_confidence:S.filter(s=>s.needs_review).length,
+      mean_confidence:Math.round(S.reduce((a,s)=>a+(s.confidence||0),0)/S.length*1000)/1000},
+    sentences:S.map((s,i)=>({i, speaker:s.speaker, text:s.text, start:s.start, end:s.end,
+      confidence:s.confidence, needs_review:s.needs_review, ...(s.edited?{edited:true}:{})}))};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='episode.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 4000);
+});
+let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(drawClip, 80); });
+
+renderHeader(); renderQueue(); renderPos(); renderCard();
+</script>
+</body>
+</html>

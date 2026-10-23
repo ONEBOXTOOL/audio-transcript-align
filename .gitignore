@@ -8,6 +8,7 @@ venv/
 
 # 运行产物 / 本地素材（BBC 音频、原文不进版本库）
 out/
+build/
 models/
 data/
 *.mp3
