@@ -4,10 +4,12 @@ __pycache__/
 .venv/
 venv/
 .pytest_cache/
+*.egg-info/
 
-# 运行产物
+# 运行产物 / 本地素材（BBC 音频、原文不进版本库）
 out/
 models/
+data/
 *.mp3
 *.wav
 *.m4a

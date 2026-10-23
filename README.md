@@ -37,6 +37,17 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### 作为 Python 包安装（推荐）
+
+```bash
+pip install -e ".[dev]"
+pytest
+audio-align --help
+```
+
+安装后会多一个 `audio-align` 命令，参数与 `python audio_align.py` 完全一致。
+仓库里的 `data/` 已加入 `.gitignore`，可以放自己的音频/文稿，不会被提交。
+
 ### 2. 准备文稿
 
 网页复制成 `txt` 即可；PDF 建议用 **layout 模式**：
