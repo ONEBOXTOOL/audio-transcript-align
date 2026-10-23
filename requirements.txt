@@ -1,0 +1,5 @@
+# audio_align.py 的依赖（Python 3.10–3.12）
+# 安装：pip install -r requirements.txt
+faster-whisper>=1.2,<2
+# PyAV 19 移除了 metadata_errors，faster-whisper 1.2.1 会直接报 TypeError
+av>=14,<19
